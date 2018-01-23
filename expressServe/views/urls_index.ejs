@@ -4,29 +4,8 @@
   <title>TinyApp</title>
 </head>
 <body>
-  <script src="expressEx.js"></script>
-   urls:urlDatabase
-   obj > key:value
-   <% for(let i in obj){
-      <li> <a href=" "> <% i %>  </a></li>
-     } <%
+      <% for(let i in urls){ %>
+        <li> <a href= <%= urls[i] %> > <%= i %>  </a></li>
+     <%  } %>
 </body>
 </html>
-
-<!--
-  <% include ../partials/head %>
-  ......
-
-   <% for(let i = 0; i < urlDatabase.length; i++) { %>
-      <li> <%= urlDatabase[i] %> </li>
-     <% } %>
-
-..........
-
- <%  var i;
-            for i in urlDatabase { %>
-
-   <li>< i.value></li>
-
-      }%>
-      -->
