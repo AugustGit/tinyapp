@@ -5,7 +5,9 @@
 </head>
 <body>
       <% for(let i in urls){ %>
-        <li> <a href= <%= urls[i] %> > <%= i %>  </a></li>
+       <!-- <li> <a href= <%= urls[i] %> > <%= i %>  </a></li> -->
+       <li> <a href= <%= urls[i] %> > <%= urls[i] + " : " + i %>  </a></li>
      <%  } %>
+     <a href= " "> Create new tiny url  </a>
 </body>
 </html>
