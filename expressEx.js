@@ -23,36 +23,39 @@ function generateRandomString() {
     return result;
 }
 
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
-
+/*
 // add new items
 app.post("/urls", (req, res) => {
-  //console.log(req.body);  ->  longURL: 'https://www.pinterest.ca' }
-  let longURL = req.body.longURL  //console.log(longURLKeyValue);
+  //console.log(req.body);  //{ longURL: 'https://www.pinterest.ca' }
+  let longURLKeyValue = req.body  //console.log(longURLKeyValue);
+  let longURL = longURLKeyValue['longURL']
+  console.log("longURL is " + longURL)
   let shortURL = generateRandomString().  //console.log(" random string " + shortURL)
-  urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
+  urlDatabase[shortURL] = longURL
+  console.log(urlDatabase) // debug statement to see POST parameters
   res.send("Ok");
 });
+app.post("/urls", (req, res) => {
+ let longURLKeyValue = req.body
+ let longURL = longURLKeyValue['longURL']
+ console.log("trying to get value " + longURL)
+ let shortURL = generateRandomString()
 
-//delete existing items
-app.post("/urls/:id/delete", (req, res) => {
-    let shortURL =  req.params.id
-  delete urlDatabase[shortURL]
-  res.redirect("/urls");
-});
-//update existing items
-app.post("/urls/:id", (req, res) => {
-  let shortURL = req.params.id
-  console.log("req.params.id " + req.params.id)
-  console.log("shortURL " + shortURL)
-  let longURL = req.body.longURL
-  console.log("req.body" + req.body)
-  console.log("longURL " + longURL)
-  urlDatabase[shortURL] = longURL
-  res.redirect("/urls");
-});
+
+ console.log(" random string " + shortURL)
+ //console.log(longURL)
+ urlDatabase[shortURL] = longURL
+ //console.log(req.body);
+ console.log(urlDatabase)
+  //{ longURL: 'https://www.pinterest.ca' }
+  // debug statement to see POST parameters
+ res.send("Ok");         // Respond with 'Ok' (we will replace this)
+});*/
+
 
 app.get("/u/:shortURL", (req, res) => {
   // let longURL = ...
@@ -80,8 +83,31 @@ app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// add new items
+app.post("/urls", (req, res) => {
+  let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
+  let shortURL = generateRandomString() //console.log(" random string " + shortURL)
+  urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
+  res.redirect("/urls"); //res.send("Ok"); removed to redirect back to origal page with new addition
+});
+
+//delete existing items
+app.post("/urls/:id/delete", (req, res) => {
+    let shortURL =  req.params.id
+  delete urlDatabase[shortURL]
+  res.redirect("/urls");
+});
+
+//update existing items
+app.post("/urls/:id", (req, res) => {
+  let shortURL = req.params.id //console.log("req.params.id " + req.params.id) //console.log("shortURL " + shortURL)
+  let longURL = req.body.longURL //console.log("req.body" + req.body) // console.log("longURL " + longURL)
+  urlDatabase[shortURL] = longURL
+  res.redirect("/urls");
+});
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
 
