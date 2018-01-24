@@ -30,20 +30,14 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let longURLKeyValue = req.body
+  //console.log(req.body);  //{ longURL: 'https://www.pinterest.ca' }
+  let longURLKeyValue = req.body  //console.log(longURLKeyValue);
   let longURL = longURLKeyValue['longURL']
-  console.log("trying to get value " + longURL)
-  let shortURL = generateRandomString()
-
-
-  console.log(" random string " + shortURL)
-  //console.log(longURL)
+  console.log("longURL is " + longURL)
+  let shortURL = generateRandomString().  //console.log(" random string " + shortURL)
   urlDatabase[shortURL] = longURL
-  //console.log(req.body);
-  console.log(urlDatabase)
-   //{ longURL: 'https://www.pinterest.ca' }
-   // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  console.log(urlDatabase) // debug statement to see POST parameters
+  res.send("Ok");
 });
 
 
