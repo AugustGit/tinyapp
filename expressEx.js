@@ -4,6 +4,7 @@ var express = require("express");
 var cookieParser = require('cookie-parser')
 
 var app = express();
+app.use(cookieParser())
 var PORT = process.env.PORT || 8080; // default port 8080
 
 const bodyParser = require("body-parser");
@@ -29,35 +30,6 @@ function generateRandomString() {
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
-/*
-// add new items
-app.post("/urls", (req, res) => {
-  //console.log(req.body);  //{ longURL: 'https://www.pinterest.ca' }
-  let longURLKeyValue = req.body  //console.log(longURLKeyValue);
-  let longURL = longURLKeyValue['longURL']
-  console.log("longURL is " + longURL)
-  let shortURL = generateRandomString().  //console.log(" random string " + shortURL)
-  urlDatabase[shortURL] = longURL
-  console.log(urlDatabase) // debug statement to see POST parameters
-  res.send("Ok");
-});
-app.post("/urls", (req, res) => {
- let longURLKeyValue = req.body
- let longURL = longURLKeyValue['longURL']
- console.log("trying to get value " + longURL)
- let shortURL = generateRandomString()
-
-
- console.log(" random string " + shortURL)
- //console.log(longURL)
- urlDatabase[shortURL] = longURL
- //console.log(req.body);
- console.log(urlDatabase)
-  //{ longURL: 'https://www.pinterest.ca' }
-  // debug statement to see POST parameters
- res.send("Ok");         // Respond with 'Ok' (we will replace this)
-});*/
-
 
 app.get("/u/:shortURL", (req, res) => {
   // let longURL = ...
@@ -81,9 +53,24 @@ app.get("/", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
+
+// since the header is on all pages  how do I call?
+app.get('/', function (req, res) {
+  // Cookies that have not been signed
+  console.log('Cookies: ', req.cookies)
+})
+
+ //login leave cookie
+ app.post("/login", (req, res) => {
+   let username = req.body.username
+   console.log("username is " + username)
+   res.cookie('username', username);
+   res.redirect("/urls")
+   });
 
 // add new items
 app.post("/urls", (req, res) => {
