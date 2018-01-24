@@ -4,10 +4,17 @@
   <title>TinyApp</title>
 </head>
 <body>
-      <% for(let i in urls){ %>
-       <!-- <li> <a href= <%= urls[i] %> > <%= i %>  </a></li> -->
-       <li> <a href= <%= urls[i] %> > <%= urls[i] + " : " + i %>  </a></li>
+      <% for(let shortURL in urls){ %>
+       <li> <a href= <%= urls[shortURL] %> > <%= shortURL + " : " +  urls[shortURL] %>  </a></li>
+         <form method="POST" action="/urls/<%=shortURL%>/delete">
+         <input id="shortURL"type="submit" value="Delete">
+       </form>
+
      <%  } %>
+
      <a href= " "> Create new tiny url  </a>
+
+
+
 </body>
 </html>

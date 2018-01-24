@@ -16,6 +16,7 @@ var urlDatabase = {
 };
 
 
+
 function generateRandomString() {
   var anysize = 6;//the size of string
   var charset = "ABCDEFGHIGKLMNOPQURSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"; //from where to create
@@ -29,16 +30,22 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// add new items
 app.post("/urls", (req, res) => {
-  //console.log(req.body);  //{ longURL: 'https://www.pinterest.ca' }
-  let longURLKeyValue = req.body  //console.log(longURLKeyValue);
-  let longURL = longURLKeyValue['longURL']
-  console.log("longURL is " + longURL)
+  //console.log(req.body);  ->  longURL: 'https://www.pinterest.ca' }
+  let longURL = req.body.longURL  //console.log(longURLKeyValue);
   let shortURL = generateRandomString().  //console.log(" random string " + shortURL)
-  urlDatabase[shortURL] = longURL
-  console.log(urlDatabase) // debug statement to see POST parameters
+  urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
   res.send("Ok");
 });
+
+//delete existing items
+app.post("/urls/:id/delete", (req, res) => {
+  let shortURL =  req.params.id
+  delete urlDatabase[shortURL]
+  res.redirect("/urls");
+});
+
 
 
 app.get("/u/:shortURL", (req, res) => {
@@ -50,9 +57,6 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id };
   res.render("urls_show", templateVars);
 });
-
-
-
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
