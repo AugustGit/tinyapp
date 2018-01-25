@@ -1,7 +1,9 @@
 
-
 var express = require("express");
+var cookieParser = require('cookie-parser')
+
 var app = express();
+app.use(cookieParser())
 var PORT = process.env.PORT || 8080; // default port 8080
 
 const bodyParser = require("body-parser");
@@ -14,6 +16,9 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+var cookiesInfo = {}
+//
+
 function generateRandomString() {
   var anysize = 6;//the size of string
   var charset = "ABCDEFGHIGKLMNOPQURSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"; //from where to create
@@ -24,38 +29,13 @@ function generateRandomString() {
 }
 
 
+
+
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+   let templateVars = {
+      foobar: cookiesInfo}
+  res.render("urls_new", templateVars);
 });
-/*
-// add new items
-app.post("/urls", (req, res) => {
-  //console.log(req.body);  //{ longURL: 'https://www.pinterest.ca' }
-  let longURLKeyValue = req.body  //console.log(longURLKeyValue);
-  let longURL = longURLKeyValue['longURL']
-  console.log("longURL is " + longURL)
-  let shortURL = generateRandomString().  //console.log(" random string " + shortURL)
-  urlDatabase[shortURL] = longURL
-  console.log(urlDatabase) // debug statement to see POST parameters
-  res.send("Ok");
-});
-app.post("/urls", (req, res) => {
- let longURLKeyValue = req.body
- let longURL = longURLKeyValue['longURL']
- console.log("trying to get value " + longURL)
- let shortURL = generateRandomString()
-
-
- console.log(" random string " + shortURL)
- //console.log(longURL)
- urlDatabase[shortURL] = longURL
- //console.log(req.body);
- console.log(urlDatabase)
-  //{ longURL: 'https://www.pinterest.ca' }
-  // debug statement to see POST parameters
- res.send("Ok");         // Respond with 'Ok' (we will replace this)
-});*/
-
 
 app.get("/u/:shortURL", (req, res) => {
   // let longURL = ...
@@ -63,12 +43,17 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id };
+  let templateVars = { shortURL: req.params.id,
+      foobar: cookiesInfo
+  };
   res.render("urls_show", templateVars);
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase,
+   foobar: cookiesInfo
+  };
+  console.log( templateVars)
   res.render("urls_index", templateVars);
 });
 
@@ -79,8 +64,37 @@ app.get("/", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
+});
+
+// since the header is on all pages  how do I call?
+app.get('/', function (req, res) {
+  let templateVars = {
+    username: cookiesInfo["username"]
+  }
+  res.render("urls", templateVars);
+  res.render("urls_index", templateVars);
+  res.render("urls/:id", templateVars);
+  res.render("urls_new", templateVars);
+
+  // Cookies that have not been signed
+  console.log('Cookies: ', req.cookies)
+})
+
+ //login leave cookie
+ app.post("/login", (req, res) => {
+  if(req.body.username !== null){
+   res.cookie('username',req.body.username);
+   let loginName = req.body.username;
+   cookiesInfo['loginID'] = loginName;
+   //console.log("username is " + loginName);
+   //console.log("cookiesInfo " + cookiesInfo)
+   res.redirect("/urls")
+   } else {
+  res.clearCookie('name')
+   }
 });
 
 // add new items
@@ -110,4 +124,3 @@ app.post("/urls/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
