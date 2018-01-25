@@ -9,6 +9,7 @@
 
 
 <body>
+  <%= foobar.loginID %>
       <% for(let shortURL in urls){ %>
        <li> <a href= <%= urls[shortURL] %> > <%= shortURL + " : " +  urls[shortURL] %>  </a></li>
          <form method="POST" action="/urls/<%=shortURL%>/delete">

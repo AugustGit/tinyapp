@@ -1,5 +1,4 @@
 
-
 var express = require("express");
 var cookieParser = require('cookie-parser')
 
@@ -17,6 +16,9 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+var cookiesInfo = {}
+//
+
 function generateRandomString() {
   var anysize = 6;//the size of string
   var charset = "ABCDEFGHIGKLMNOPQURSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"; //from where to create
@@ -25,6 +27,8 @@ function generateRandomString() {
         result += charset[Math.floor(Math.random() * charset.length)];
     return result;
 }
+
+
 
 
 app.get("/urls/new", (req, res) => {
@@ -37,12 +41,16 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id };
+  let templateVars = { shortURL: req.params.id
+  };
   res.render("urls_show", templateVars);
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase,
+   foobar: cookiesInfo
+  };
+  console.log( templateVars)
   res.render("urls_index", templateVars);
 });
 
@@ -60,15 +68,25 @@ app.get("/hello", (req, res) => {
 
 // since the header is on all pages  how do I call?
 app.get('/', function (req, res) {
+  let templateVars = {
+    username: cookiesInfo["username"]
+  }
+  res.render("urls", templateVars);
+  res.render("urls_index", templateVars);
+  res.render("urls/:id", templateVars);
+  res.render("urls_new", templateVars);
+
   // Cookies that have not been signed
   console.log('Cookies: ', req.cookies)
 })
 
  //login leave cookie
  app.post("/login", (req, res) => {
-   let username = req.body.username
-   console.log("username is " + username)
-   res.cookie('username', username);
+   res.cookie('username',req.body.username);
+   let loginName = req.body.username;
+   cookiesInfo['loginID'] = loginName;
+   //console.log("username is " + loginName);
+   //console.log("cookiesInfo " + cookiesInfo)
    res.redirect("/urls")
    });
 
@@ -99,4 +117,3 @@ app.post("/urls/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
