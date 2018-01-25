@@ -85,13 +85,17 @@ app.get('/', function (req, res) {
 
  //login leave cookie
  app.post("/login", (req, res) => {
+  if(req.body.username !== null){
    res.cookie('username',req.body.username);
    let loginName = req.body.username;
    cookiesInfo['loginID'] = loginName;
    //console.log("username is " + loginName);
    //console.log("cookiesInfo " + cookiesInfo)
    res.redirect("/urls")
-   });
+   } else {
+  res.clearCookie('name')
+   }
+});
 
 // add new items
 app.post("/urls", (req, res) => {
