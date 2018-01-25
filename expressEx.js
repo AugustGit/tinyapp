@@ -18,7 +18,7 @@ var urlDatabase = {
 
 var cookiesInfo = {}
 //
-var userRegistrar = {}
+var userDatabase = {}
 
 function generateRandomString() {
   var anysize = 6;//the size of string
@@ -33,7 +33,7 @@ function generateRandomString() {
 app.get("/urls/register", (req, res) => {
   let templateVars = {
     cookieFoobar: cookiesInfo,
-    userRegistrarFoobar: userRegistrar
+    userDatabaseFoobar: userDatabase
   }
   res.render("urls_register", templateVars)
 });
@@ -41,7 +41,7 @@ app.get("/urls/register", (req, res) => {
 app.get("/urls/new", (req, res) => {
    let templateVars = {
       cookieFoobar: cookiesInfo,
-      userRegistrarFoobar: userRegistrar
+      uuserDatabaseFoobar: userDatabase
     }
   res.render("urls_new", templateVars);
 });
@@ -54,7 +54,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
       cookieFoobar: cookiesInfo,
-      userRegistrarFoobar: userRegistrar
+      uuserDatabaseFoobar: userDatabase
   };
   res.render("urls_show", templateVars);
 });
@@ -62,7 +62,7 @@ app.get("/urls/:id", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
    cookieFoobar: cookiesInfo,
-   userRegistrarFoobar: userRegistrar
+   userDatabaseFoobar: userDatabase
   };
   console.log( templateVars)
   res.render("urls_index", templateVars);
@@ -84,7 +84,7 @@ app.get("/hello", (req, res) => {
 app.get('/', function (req, res) {
   let templateVars = {
     username: cookiesInfo["username"],
-    userRegistrarFoobar: userRegistrar["email"]
+    userDatabaseFoobar: userDatabase["email"]
   }
 // Cookies that have not been signed
   console.log('Cookies: ', req.cookies)
@@ -102,20 +102,25 @@ app.get('/', function (req, res) {
    //console.log("cookiesInfo " + cookiesInfo)
    res.redirect("/urls")
    } else {
-  res.clearCookie('name')
+   res.clearCookie('name')
    }
 });
 
  //registration page
 app.post("/urls/register", (req, res) => {
-    console.log("req.body is " + req.body);
-    let emailInput = req.body.email;
-    console.log("emailInput is " + emailInput );
-    let passwordInput = req.body.password;
-    console.log("passwordInput is " + passwordInput );
-    userRegistrar.userEmail = emailInput;
-    userRegistrar.userPassword = passwordInput;
-    console.log("userRegistrar is " + userRegistrar );
+ let randomID = generateRandomString()
+ res.cookie('userId',randomID);
+ res.cookie('email',req.body.email);
+ res.cookie('password',req.body.password)
+
+ let emailInput = req.body.email;
+ let passwordInput = req.body.password;
+ userDatabase[randomID] = {
+    userID: randomID,
+    userEmail: emailInput,
+    userPassword: passwordInput
+    }
+  console.log(userDatabase)
   res.redirect("/urls");
 });
 
