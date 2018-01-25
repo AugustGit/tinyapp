@@ -32,7 +32,9 @@ function generateRandomString() {
 
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+   let templateVars = {
+      foobar: cookiesInfo}
+  res.render("urls_new", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -41,7 +43,8 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id
+  let templateVars = { shortURL: req.params.id,
+      foobar: cookiesInfo
   };
   res.render("urls_show", templateVars);
 });
