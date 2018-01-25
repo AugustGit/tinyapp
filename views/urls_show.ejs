@@ -3,11 +3,11 @@
 <head>
   <title>TinyApp</title>
 </head>
+<header>
+    <% include ./partials/_header %>
+</header>
 
 <body>
-
-
- <% include partials/_header %>
  <center><p>To update the website associated with<b>  SHORT URL: <%= shortURL  %> </b>   fill out the URL field below</p></center>
     <form action="/urls/<%= shortURL  %> " method="POST" style="margin:150px;">
       <label for="longURL">Enter a URL:</label>
