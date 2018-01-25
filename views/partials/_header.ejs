@@ -1,15 +1,16 @@
 
-<% if(foobar.loginID == null){%>
+
+<% if(cookieFoobar.loginID == null){%>
 
     <form action="/login" method="POST" style="margin:150px;">
       <label for="username">< username </label>
-      <input id="username" type="text" name="username" placeholder="http://" style="width: 300px">
+      <input id="username" type="text" name="username" placeholder="enter your username" style="width: 300px">
       <input type="submit" value="Submit">
     </form>
 
  <% } else { %>
 
- <%="Logged in as: " + foobar.loginID %>
+ <%="Logged in as: " + cookieFoobar.loginID %>
   <form action="/login" method="POST" style="margin:150px;">
         <input type="submit" value="LogOut">
  </form>

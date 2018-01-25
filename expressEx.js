@@ -18,10 +18,11 @@ var urlDatabase = {
 
 var cookiesInfo = {}
 //
+var userRegistrar = {}
 
 function generateRandomString() {
   var anysize = 6;//the size of string
-  var charset = "ABCDEFGHIGKLMNOPQURSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789"; //from where to create
+  var charset = "ABCDEFGHIGKLMNOPQURSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789";
   result= "";
      for( var i=0; i < anysize; i++ )
         result += charset[Math.floor(Math.random() * charset.length)];
@@ -29,11 +30,19 @@ function generateRandomString() {
 }
 
 
-
+app.get("/urls/register", (req, res) => {
+  let templateVars = {
+    cookieFoobar: cookiesInfo,
+    userRegistrarFoobar: userRegistrar
+  }
+  res.render("urls_register", templateVars)
+});
 
 app.get("/urls/new", (req, res) => {
    let templateVars = {
-      foobar: cookiesInfo}
+      cookieFoobar: cookiesInfo,
+      userRegistrarFoobar: userRegistrar
+    }
   res.render("urls_new", templateVars);
 });
 
@@ -44,14 +53,16 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
-      foobar: cookiesInfo
+      cookieFoobar: cookiesInfo,
+      userRegistrarFoobar: userRegistrar
   };
   res.render("urls_show", templateVars);
 });
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
-   foobar: cookiesInfo
+   cookieFoobar: cookiesInfo,
+   userRegistrarFoobar: userRegistrar
   };
   console.log( templateVars)
   res.render("urls_index", templateVars);
@@ -69,21 +80,19 @@ app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-// since the header is on all pages  how do I call?
+
 app.get('/', function (req, res) {
   let templateVars = {
-    username: cookiesInfo["username"]
+    username: cookiesInfo["username"],
+    userRegistrarFoobar: userRegistrar["email"]
   }
-  res.render("urls", templateVars);
-  res.render("urls_index", templateVars);
-  res.render("urls/:id", templateVars);
-  res.render("urls_new", templateVars);
-
-  // Cookies that have not been signed
+// Cookies that have not been signed
   console.log('Cookies: ', req.cookies)
 })
 
- //login leave cookie
+
+
+ //login/logout leave cookie
  app.post("/login", (req, res) => {
   if(req.body.username !== null){
    res.cookie('username',req.body.username);
@@ -95,6 +104,19 @@ app.get('/', function (req, res) {
    } else {
   res.clearCookie('name')
    }
+});
+
+ //registration page
+app.post("/urls/register", (req, res) => {
+    console.log("req.body is " + req.body);
+    let emailInput = req.body.email;
+    console.log("emailInput is " + emailInput );
+    let passwordInput = req.body.password;
+    console.log("passwordInput is " + passwordInput );
+    userRegistrar.userEmail = emailInput;
+    userRegistrar.userPassword = passwordInput;
+    console.log("userRegistrar is " + userRegistrar );
+  res.redirect("/urls");
 });
 
 // add new items
