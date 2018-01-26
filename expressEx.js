@@ -12,16 +12,25 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs")
 
 var urlDatabase = {
+  //shortURL: longURL
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-var cookiesInfo = {}
-//
+//var cookiesInfo = {
+    //cookie('userId',randomID);
+   //cookie('email',req.body.email);
+    //cookie('password',req.body.password)
+//}
+
 var userDatabase = {
-                userID123:  {userID: "randomID123",
+                userID123:  {userID: "ID123",
                              userEmail: "123@123.com",
-                             userPassword: "passwordInput123"
+                             userPassword: "123"
+                             },
+                 userID222:  {userID: "ID222",
+                             userEmail: "222@222.com",
+                             userPassword: "222"
                              }
                    }
 
@@ -35,19 +44,40 @@ function generateRandomString() {
 }
 
 
+//>> GET <<
+
+app.get("/", (req, res) => {
+  let templateVars = {
+    url: urlDatabase,
+    username: userDatabase[req.cookies["userID"]]}; // added code
+  res.render('index', templateVars);
+});
+
+
+app.get('/urls', (req,res) => {
+   let templateVars = {
+    url: urlDatabase,
+    username: userDatabase[req.cookies["userID"]]};
+  res.render('urls_index', templateVars);
+});
+app.get("/urls/login", (req, res) => {
+  // let templateVars = {
+   // url: urlDatabase,
+   // username: userDatabase[req.cookies["userID"]]};
+  res.render("urls_login");
+});
+
 app.get("/urls/register", (req, res) => {
   let templateVars = {
-    cookieFoobar: cookiesInfo,
-    userDatabaseFoobar: userDatabase
-  }
+    url: urlDatabase,
+    username: userDatabase[req.cookies["userID"]]}; /// updated template vars
   res.render("urls_register", templateVars)
 });
 
 app.get("/urls/new", (req, res) => {
-   let templateVars = {
-      cookieFoobar: cookiesInfo,
-      uuserDatabaseFoobar: userDatabase
-    }
+    let templateVars = {
+    url: urlDatabase,
+    username: userDatabase[req.cookies["userID"]]}; // updated template vars
   res.render("urls_new", templateVars);
 });
 
@@ -57,20 +87,10 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id,
-      cookieFoobar: cookiesInfo,
-      uuserDatabaseFoobar: userDatabase
-  };
+ let templateVars = {
+    url: urlDatabase,
+    username: userDatabase[req.cookies["userID"]]}; // updated template vars
   res.render("urls_show", templateVars);
-});
-
-app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase,
-   cookieFoobar: cookiesInfo,
-   userDatabaseFoobar: userDatabase
-  };
- // console.log( templateVars)
-  res.render("urls_index", templateVars);
 });
 
 app.get("/", (req, res) => {
@@ -85,34 +105,16 @@ app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-
 app.get('/', function (req, res) {
   let templateVars = {
-    username: cookiesInfo["username"],
-    userDatabaseFoobar: userDatabase["email"]
+    url: urlDatabase,
+    username: userDatabase[req.cookies["userID"]]
   }
 // Cookies that have not been signed
   console.log('Cookies: ', req.cookies)
 })
 
-
-
- //login + login cookie //
- app.post("/login", (req, res) => {
-    res.cookie('username',req.body.username);
-   let loginName = req.body.username;
-   cookiesInfo['loginID'] = loginName;
-   //console.log("username is " + loginName);
-   //console.log("cookiesInfo " + cookiesInfo)
-   res.redirect("/urls")
-
-});
-
-  app.post("/logout", (req, res) => {
-  if(req.body){
-   res.redirect("/urls")
-   }
-});
+//>> POST <<
 
  //registration page
 app.post("/urls/register", (req, res) => {
@@ -121,7 +123,6 @@ app.post("/urls/register", (req, res) => {
      res.status(400).send({ error: "missing email or password" });
    }
    for (var user in userDatabase) {
-    console.log(user)
 
   if (req.body.email == userDatabase[user].userEmail) {
       res.status(400).send({ error: "that email already exists" });
@@ -130,8 +131,8 @@ app.post("/urls/register", (req, res) => {
 
     let randomID = generateRandomString()
     res.cookie('userId',randomID);
-    res.cookie('email',req.body.email);
-    res.cookie('password',req.body.password)
+    //res.cookie('email',req.body.email);
+    //res.cookie('password',req.body.password)
 
      let emailInput = req.body.email;
      let passwordInput = req.body.password;
@@ -145,7 +146,35 @@ app.post("/urls/register", (req, res) => {
 
 });
 
-// add new items
+ //login + login cookie //
+ app.post("urls/login", (req, res) => {
+  console.log (req.body.username, req.body.password)
+ var emailInput = req.body.username
+ var passwordInput =req.body.password
+ var userIDassignment = 0
+  for (var info in userDatabase){
+    if(userDatabase[info]["email"] === emailInput) {
+    userIDassignment = userDatabase[info]["UserID"];
+    }
+  }
+  if(!userIDassignment){
+    res.status(400).send({ error: "Your email is not registered." });
+  } else {
+    if(userDatabase[userIDassignment]["userPassword"] !== passwordInput) {
+      res.status(403).send("Your password is incorrect.");
+    }
+  }
+       res.cookie('userId', userIDassignment);
+       res.redirect("/urls");
+});
+
+ //logout
+  app.post("/logout", (req, res) => {
+    res.clearCookie('userID');
+  res.redirect("/urls")
+});
+
+// Add New URL
 app.post("/urls", (req, res) => {
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
   let shortURL = generateRandomString()
@@ -153,14 +182,14 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls"); //res.send("Ok"); removed to redirect back to origal page with new addition
 });
 
-//delete existing items
+//Delete Existing URL
 app.post("/urls/:id/delete", (req, res) => {
     let shortURL =  req.params.id
   delete urlDatabase[shortURL]
   res.redirect("/urls");
 });
 
-//update existing items
+//Update Existing URL
 app.post("/urls/:id", (req, res) => {
   let shortURL = req.params.id //console.log("req.params.id " + req.params.id) //console.log("shortURL " + shortURL)
   let longURL = req.body.longURL //console.log("req.body" + req.body) // console.log("longURL " + longURL)
@@ -170,5 +199,6 @@ app.post("/urls/:id", (req, res) => {
 
 
 app.listen(PORT, () => {
+  console.log(PORT)
   console.log(`Example app listening on port ${PORT}!`);
 });
