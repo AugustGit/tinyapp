@@ -4,17 +4,14 @@
   <title>TinyApp</title>
 </head>
 <header>
-    <% include ./partials/_header %>
+  <% include("./partials/_header", {userId: userId }) %>
 </header>
 
 <body>
-   <form action="/logout" method="POST">
-        <input type="submit" value="LogOut">
- </form>
 
  <center><p>To update the website associated with<b>  SHORT URL: <%= shortURL  %> </b>   fill out the URL field below</p></center>
-  <% for(var shortURL in url){ %>
-    <form action="/urls/<%= shortURL  %> " method="POST" style="margin:150px;">
+
+    <form action="/urls/<%=shortURL%> " method="POST" style="margin:150px;">
       <label for="longURL">Enter a URL:</label>
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Update">

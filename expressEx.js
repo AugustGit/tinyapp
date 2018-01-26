@@ -63,7 +63,7 @@ app.get('/urls', (req,res) => {
    let userId = req.cookies["userId"];
    let templateVars = {
     url: urlDatabase,
-    userIds: userDatabase[req.cookies["userId"]]};
+    userId: userId};
   res.render('urls_index', templateVars);
 });
 
@@ -83,22 +83,33 @@ app.get("/urls/register", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-
+let userId = req.cookies["userId"];
     let templateVars = {
     url: urlDatabase,
-    userIds: userDatabase[req.cookies["userId"]]}; // updated template vars
+    userId: userId
+    }; // updated template vars
   res.render("urls_new", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  let userId = req.cookies["userId"];
+  let templateVars = {
+    url: urlDatabase,
+    userId: userId
+    }; //
   // let longURL = ...
   res.redirect(longURL);
 });
 
 app.get("/urls/:id", (req, res) => {
+  let userId = req.cookies["userId"];
+  var shortURL = req.params.id;
  let templateVars = {
+    shortURL: shortURL,
+    longURL: urlDatabase[req.params.id],
     url: urlDatabase,
-    userIds: userDatabase[req.cookies["userId"]]}; // updated template vars
+    userId: userId
+    }; // updated template vars
   res.render("urls_show", templateVars);
 });
 
@@ -132,8 +143,6 @@ app.post("/urls/register", (req, res) => {
       res.status(400).send({ error: "that email already exists" });
     } else {
 
-//console.log(userDatabase)
-//console.log(newUserID)
      userDatabase[newUserID] = {
           userId:  newUserID,
           userEmail: emailInput,
@@ -142,7 +151,7 @@ app.post("/urls/register", (req, res) => {
      }
   }
    res.cookie('userId', newUserID);
-// console.log(userDatabase)
+
   res.redirect("/urls");
 
 });
@@ -153,7 +162,6 @@ app.post("/urls/register", (req, res) => {
  //console.log (req.body.username + req.body.password)
 
  var emailInput = req.body.username;
- //console.log(emailInput)
  var passwordInput = req.body.password;
  let userIdAssignment = ""
 
@@ -183,14 +191,35 @@ app.post("/urls/register", (req, res) => {
   res.redirect("/urls")
 });
 
-// Add New URL
+// Add New URL'
+
 app.post("/urls", (req, res) => {
+  let userId = req.cookies["userId"]
+  if (!userDatabase.hasOwnProperty(userId)) {
+
+
+  let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
+  let shortURL = generateRandomString() //console.log(" random string " + shortURL)
+  urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
+  res.redirect("/urls");
+  } else {
+    res.redirect("/urls/login");
+  }
+ //res.send("Ok"); removed to redirect back to origal page with new addition
+});
+/*
+app.post("/urls", (req, res) => {
+   let userId = req.cookies["userId"]
+    if (userId in userDatabase) {
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
   let shortURL = generateRandomString()
   urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
   res.redirect("/urls"); //res.send("Ok"); removed to redirect back to origal page with new addition
+ } else {
+ res.redirect("/urls/login");
+ }
 });
-
+*/
 //Delete Existing URL
 app.post("/urls/:id/delete", (req, res) => {
     let shortURL =  req.params.id

@@ -4,12 +4,12 @@
   <title>TinyApp</title>
 </head>
 <header>
-  //  <% include ./partials/_header %>
+ <% include("./partials/_header", {userId: userId }) %>
 </header>
 
-<body>
+
       <% for(var shortURL in url){ %>
-       <li> <a href= <%=url[shortURL]%> > <%= shortURL + " : " +  url[shortURL] %>  </a></li>
+       <li> <a href= <%=url/[shortURL]%> > <%= shortURL + " : " +  url[shortURL] %>  </a></li>
          <form method="POST" action="/urls/<%=shortURL%>/delete">
          <input id="shortURL" type="submit" value="Delete">
        </form>
