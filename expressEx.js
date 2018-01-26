@@ -24,11 +24,11 @@ var urlDatabase = {
 //}
 
 var userDatabase = {
-                userID123:  {userID: "ID123",
+                userId123:  {userId: "ID123",
                              userEmail: "123@123.com",
                              userPassword: "123"
                              },
-                 userID222:  {userID: "ID222",
+                 userId222:  {userId: "ID222",
                              userEmail: "222@222.com",
                              userPassword: "222"
                              }
@@ -42,29 +42,12 @@ function generateRandomString() {
         result += charset[Math.floor(Math.random() * charset.length)];
     return result;
 }
-
-function FindID(email) {
-  for (let userID in userDatabase) {
-    if (userDatabase[userId].userEmail === email) {
-      return userID;
-    }
-  }
-  return false;
-}
-
-function FindEmail (userId) {
-  if (userID) {
-    return userDatabase[userID].userEmail;
-  }
-  return '';
-}
-
 //>> GET << Basuc
 
 app.get("/", (req, res) => {
  // let templateVars = {
 //    url: urlDatabase,
-//    username: userDatabase[req.cookies["userID"]]}; // added code
+//    username: userDatabase[req.cookies["userId"]]}; // added code
   res.render('index'/*, templateVars*/);
 });
 
@@ -77,25 +60,25 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get('/urls', (req,res) => {
-   let userID = req.cookies["userId"];
+   let userId = req.cookies["userId"];
    let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userID"]]};
+    username: userDatabase[req.cookies["userId"]]};
   res.render('urls_index', templateVars);
 });
 
 
 app.get("/urls/login", (req, res) => {
-  // let templateVars = {
-   // url: urlDatabase,
-   // username: userDatabase[req.cookies["userID"]]};
-  res.render("urls_login");
+  let templateVars = {
+  url: urlDatabase,
+  username: userDatabase[req.cookies["userId"]]};
+  res.render("urls_login",templateVars);
 });
 
 app.get("/urls/register", (req, res) => {
   let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userID"]]}; /// updated template vars
+    username: userDatabase[req.cookies["userId"]]}; /// updated template vars
   res.render("urls_register", templateVars)
 });
 
@@ -103,7 +86,7 @@ app.get("/urls/new", (req, res) => {
 
     let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userID"]]}; // updated template vars
+    username: userDatabase[req.cookies["userId"]]}; // updated template vars
   res.render("urls_new", templateVars);
 });
 
@@ -115,7 +98,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
  let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userID"]]}; // updated template vars
+    username: userDatabase[req.cookies["userId"]]}; // updated template vars
   res.render("urls_show", templateVars);
 });
 
@@ -127,7 +110,7 @@ app.get("/hello", (req, res) => {
 app.get('/', function (req, res) {
   let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userID"]]
+    username: userDatabase[req.cookies["userId"]]
   }
 // Cookies that have not been signed
   console.log('Cookies: ', req.cookies)
@@ -135,7 +118,7 @@ app.get('/', function (req, res) {
 
 //>> POST <<
 
- //registration page
+ //Registration page
 app.post("/urls/register", (req, res) => {
 
   if (!req.body.email || !req.body.password) {
@@ -156,7 +139,7 @@ app.post("/urls/register", (req, res) => {
      let emailInput = req.body.email;
      let passwordInput = req.body.password;
        userDatabase[randomID] = {
-    userID: randomID,
+    userId: randomID,
     userEmail: emailInput,
     userPassword: passwordInput
     }
@@ -165,27 +148,37 @@ app.post("/urls/register", (req, res) => {
 
 });
 
+
  //login + login cookie //
- app.post("urls/login", (req, res) => {
- console.log (req.body["username"], req.body["password"])
- var emailInput = req.body.username
- var passwordInput =req.body.password
- var userIDassignment = FindUserID( emailInput)
+ app.post("/login", (req, res) => {
+ console.log (req.body.username + req.body.password)
 
-  if((userIDassignment === userDatabase[userID].userPassword) && (passwordInput === userDatabase[userID].userPassword)){
-    res.status(400).send({ error: "Your email is not registered." });
-     res.cookie('userId', userIDassignment);
-      res.redirect("/urls");
+ var emailInput = req.body.username;
+ console.log(emailInput)
+ var passwordInput = req.body.password;
+ let userIdAssignment = ""
 
-   } else {
-
-      res.status(403).send("Your password is incorrect.");
+  for (var elem in userDatabase) {
+    if(userDatabase[elem]["userEmail"] === emailInput) {
+      userIdAssignment = userDatabase[elem]["userId"];
     }
+
+  if(!userIdAssignment) {
+      res.status(403).send("This user is not registered.");
+  } else {
+
+//userDatabase[userIdAssignment]['userPassword']
+console.log(userIdAssignment)
+    if(userDatabase[userIdAssignment]["userPassword"] !== passwordInput) {
+      res.status(403).send("Incorrect password.");
+    }
+   }
+  }
 });
 
  //logout
   app.post("/logout", (req, res) => {
-    res.clearCookie('userID');
+    res.clearCookie('userId');
   res.redirect("/urls")
 });
 
