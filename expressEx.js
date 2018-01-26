@@ -18,7 +18,12 @@ var urlDatabase = {
 
 var cookiesInfo = {}
 //
-var userDatabase = {}
+var userDatabase = {
+                userID123:  {userID: "randomID123",
+                             userEmail: "123@123.com",
+                             userPassword: "passwordInput123"
+                             }
+                   }
 
 function generateRandomString() {
   var anysize = 6;//the size of string
@@ -64,7 +69,7 @@ app.get("/urls", (req, res) => {
    cookieFoobar: cookiesInfo,
    userDatabaseFoobar: userDatabase
   };
-  console.log( templateVars)
+ // console.log( templateVars)
   res.render("urls_index", templateVars);
 });
 
@@ -92,42 +97,58 @@ app.get('/', function (req, res) {
 
 
 
- //login/logout leave cookie
+ //login + login cookie //
  app.post("/login", (req, res) => {
-  if(req.body.username !== null){
-   res.cookie('username',req.body.username);
+    res.cookie('username',req.body.username);
    let loginName = req.body.username;
    cookiesInfo['loginID'] = loginName;
    //console.log("username is " + loginName);
    //console.log("cookiesInfo " + cookiesInfo)
    res.redirect("/urls")
-   } else {
-   res.clearCookie('name')
+
+});
+
+  app.post("/logout", (req, res) => {
+  if(req.body){
+   res.redirect("/urls")
    }
 });
 
  //registration page
 app.post("/urls/register", (req, res) => {
- let randomID = generateRandomString()
- res.cookie('userId',randomID);
- res.cookie('email',req.body.email);
- res.cookie('password',req.body.password)
 
- let emailInput = req.body.email;
- let passwordInput = req.body.password;
- userDatabase[randomID] = {
+  if (!req.body.email || !req.body.password) {
+     res.status(400).send({ error: "missing email or password" });
+   }
+   for (var user in userDatabase) {
+    console.log(user)
+
+  if (req.body.email == userDatabase[user].userEmail) {
+      res.status(400).send({ error: "that email already exists" });
+    }
+   }
+
+    let randomID = generateRandomString()
+    res.cookie('userId',randomID);
+    res.cookie('email',req.body.email);
+    res.cookie('password',req.body.password)
+
+     let emailInput = req.body.email;
+     let passwordInput = req.body.password;
+       userDatabase[randomID] = {
     userID: randomID,
     userEmail: emailInput,
     userPassword: passwordInput
     }
-  console.log(userDatabase)
+// console.log(userDatabase)
   res.redirect("/urls");
+
 });
 
 // add new items
 app.post("/urls", (req, res) => {
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
-  let shortURL = generateRandomString() //console.log(" random string " + shortURL)
+  let shortURL = generateRandomString()
   urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
   res.redirect("/urls"); //res.send("Ok"); removed to redirect back to origal page with new addition
 });
