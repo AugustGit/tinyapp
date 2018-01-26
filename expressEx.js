@@ -24,11 +24,11 @@ var urlDatabase = {
 //}
 
 var userDatabase = {
-                userId123:  {userId: "ID123",
+                ID123:  {userId: "ID123",
                              userEmail: "123@123.com",
                              userPassword: "123"
                              },
-                 userId222:  {userId: "ID222",
+                 ID222:  {userId: "ID222",
                              userEmail: "222@222.com",
                              userPassword: "222"
                              }
@@ -63,7 +63,7 @@ app.get('/urls', (req,res) => {
    let userId = req.cookies["userId"];
    let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userId"]]};
+    userIds: userDatabase[req.cookies["userId"]]};
   res.render('urls_index', templateVars);
 });
 
@@ -71,14 +71,14 @@ app.get('/urls', (req,res) => {
 app.get("/urls/login", (req, res) => {
   let templateVars = {
   url: urlDatabase,
-  username: userDatabase[req.cookies["userId"]]};
+  userIds: userDatabase[req.cookies["userId"]]};
   res.render("urls_login",templateVars);
 });
 
 app.get("/urls/register", (req, res) => {
   let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userId"]]}; /// updated template vars
+    userIds: userDatabase[req.cookies["userId"]]}; /// updated template vars
   res.render("urls_register", templateVars)
 });
 
@@ -86,7 +86,7 @@ app.get("/urls/new", (req, res) => {
 
     let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userId"]]}; // updated template vars
+    userIds: userDatabase[req.cookies["userId"]]}; // updated template vars
   res.render("urls_new", templateVars);
 });
 
@@ -98,7 +98,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
  let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userId"]]}; // updated template vars
+    userIds: userDatabase[req.cookies["userId"]]}; // updated template vars
   res.render("urls_show", templateVars);
 });
 
@@ -110,7 +110,7 @@ app.get("/hello", (req, res) => {
 app.get('/', function (req, res) {
   let templateVars = {
     url: urlDatabase,
-    username: userDatabase[req.cookies["userId"]]
+    userIds: userDatabase[req.cookies["userId"]]
   }
 // Cookies that have not been signed
   console.log('Cookies: ', req.cookies)
@@ -120,7 +120,9 @@ app.get('/', function (req, res) {
 
  //Registration page
 app.post("/urls/register", (req, res) => {
-
+ let emailInput = req.body.email;
+ let passwordInput = req.body.password;
+ let newUserID = generateRandomString()
   if (!req.body.email || !req.body.password) {
      res.status(400).send({ error: "missing email or password" });
    }
@@ -128,21 +130,18 @@ app.post("/urls/register", (req, res) => {
 
   if (req.body.email == userDatabase[user].userEmail) {
       res.status(400).send({ error: "that email already exists" });
-    }
-   }
+    } else {
 
-    let randomID = generateRandomString()
-    res.cookie('userId',randomID);
-    //res.cookie('email',req.body.email);
-    //res.cookie('password',req.body.password)
-
-     let emailInput = req.body.email;
-     let passwordInput = req.body.password;
-       userDatabase[randomID] = {
-    userId: randomID,
-    userEmail: emailInput,
-    userPassword: passwordInput
-    }
+//console.log(userDatabase)
+//console.log(newUserID)
+     userDatabase[newUserID] = {
+          userId:  newUserID,
+          userEmail: emailInput,
+          userPassword: passwordInput
+           }
+     }
+  }
+   res.cookie('userId', newUserID);
 // console.log(userDatabase)
   res.redirect("/urls");
 
@@ -151,10 +150,10 @@ app.post("/urls/register", (req, res) => {
 
  //login + login cookie //
  app.post("/login", (req, res) => {
- console.log (req.body.username + req.body.password)
+ //console.log (req.body.username + req.body.password)
 
  var emailInput = req.body.username;
- console.log(emailInput)
+ //console.log(emailInput)
  var passwordInput = req.body.password;
  let userIdAssignment = ""
 
@@ -162,18 +161,20 @@ app.post("/urls/register", (req, res) => {
     if(userDatabase[elem]["userEmail"] === emailInput) {
       userIdAssignment = userDatabase[elem]["userId"];
     }
+  }
 
-  if(!userIdAssignment) {
+  if(userIdAssignment === "") {
       res.status(403).send("This user is not registered.");
   } else {
 
-//userDatabase[userIdAssignment]['userPassword']
-console.log(userIdAssignment)
     if(userDatabase[userIdAssignment]["userPassword"] !== passwordInput) {
+
       res.status(403).send("Incorrect password.");
     }
    }
-  }
+
+  res.cookie('userId',userIdAssignment);
+  res.redirect("/urls")
 });
 
  //logout
