@@ -180,6 +180,9 @@ app.post("/urls/register", (req, res) => {
           userEmail: emailInput,
           userPassword: passwordInput
            }
+
+     urlDatabase[newUserID] = {
+      }
     }
   }
    res.cookie('userId', newUserID);
@@ -222,39 +225,62 @@ app.post("/urls/register", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-
+  let userId = req.cookies["userId"];
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
-  let shortURL = generateRandomString() //console.log(" random string " + shortURL)
-  urlDatabase.userId[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
+  let shortURL = generateRandomString()
+  let userURLs= urlDatabase[userId]
+  userURLs[shortURL] = longURL
   res.redirect("/urls");
 });
 
 //ADD NEW URL
 app.post("/urls", (req, res) => {
-
+  let userId = req.cookies["userId"];
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
-  let shortURL = generateRandomString() //console.log(" random string " + shortURL)
-  urlDatabase.userId[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
+  let shortURL = generateRandomString()
+  let userURLs = urlDatabase[userId]
+  userURLs[shortURL] = longURL
   res.redirect("/urls");
 });
 
 //DELETE EXISTING URL
 app.post("/urls/:id/delete", (req, res) => {
+    let userId = req.cookies["userId"];
     let shortURL =  req.params.id
-  delete urlDatabase[shortURL]
+    let userURLs = urlDatabase[userId]
+  delete userURLs[shortURL]
   res.redirect("/urls");
 });
 
 //UPDATE EXISTING URL
 app.post("/urls/:id", (req, res) => {
+  let userId = req.cookies["userId"];
   let shortURL = req.params.id //console.log("req.params.id " + req.params.id) //console.log("shortURL " + shortURL)
   let longURL = req.body.longURL //console.log("req.body" + req.body) // console.log("longURL " + longURL)
-  urlDatabase[shortURL] = longURL
+  let userURLs = urlDatabase[userId]
+  userURLs[shortURL] = longURL
   res.redirect("/urls");
 });
+
+
+
 
 
 app.listen(PORT, () => {
   console.log(PORT)
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
