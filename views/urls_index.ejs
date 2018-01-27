@@ -8,8 +8,8 @@
 
 
 
-      <% for(var shortURL in url){ %>
-       <li> <a href= <%=url/[shortURL]%> > <%= shortURL + " : " +  url[shortURL] %>  </a></li>
+      <% for(var shortURL in urlDatabase.userId){ %>
+       <li> <a href= <%=urlDatabase.userId/[shortURL]%> > <%= shortURL + " : " +  urlDatabase.userId[shortURL] %>  </a></li>
          <form method="POST" action="/urls/<%=shortURL%>/delete">
          <input id="shortURL" type="submit" value="Delete">
        </form>
