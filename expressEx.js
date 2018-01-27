@@ -63,7 +63,7 @@ app.get('/urls', (req,res) => {
    let userId = req.cookies["userId"];
    let templateVars = {
     url: urlDatabase,
-    userId: userId};
+    userId: req.cookies["userId"]};
   res.render('urls_index', templateVars);
 });
 
@@ -71,14 +71,14 @@ app.get('/urls', (req,res) => {
 app.get("/urls/login", (req, res) => {
   let templateVars = {
   url: urlDatabase,
-  userIds: userDatabase[req.cookies["userId"]]};
+  userId: req.cookies["userId"]};
   res.render("urls_login",templateVars);
 });
 
 app.get("/urls/register", (req, res) => {
   let templateVars = {
     url: urlDatabase,
-    userIds: userDatabase[req.cookies["userId"]]}; /// updated template vars
+    userId: req.cookies["userId"]}; /// updated template vars
   res.render("urls_register", templateVars)
 });
 
@@ -104,7 +104,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let userId = req.cookies["userId"];
   var shortURL = req.params.id;
- let templateVars = {
+  let templateVars = {
     shortURL: shortURL,
     longURL: urlDatabase[req.params.id],
     url: urlDatabase,
@@ -196,8 +196,6 @@ app.post("/urls/register", (req, res) => {
 app.post("/urls", (req, res) => {
   let userId = req.cookies["userId"]
   if (!userDatabase.hasOwnProperty(userId)) {
-
-
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
   let shortURL = generateRandomString() //console.log(" random string " + shortURL)
   urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
@@ -208,6 +206,22 @@ app.post("/urls", (req, res) => {
  //res.send("Ok"); removed to redirect back to origal page with new addition
 });
 /*
+  if (userChecker(req.session.user_id)) {
+    let customLinks = {};
+    for (let link in urlDatabase){
+      if (urlDatabase[link].createdBy === req.session.user_id){
+        customLinks[link] = urlDatabase[link];
+      }
+    }
+    let templateVars = {
+      url: customLinks,
+      username: users[req.session.user_id]
+    };
+    res.render('urls_new', templateVars);
+  } else {
+    res.status(401).send('Error: 401: You are not authorized, Please <a href="/"> Login </a>');
+  }
+});
 app.post("/urls", (req, res) => {
    let userId = req.cookies["userId"]
     if (userId in userDatabase) {

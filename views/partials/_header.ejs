@@ -1,15 +1,18 @@
 
-  <% if (userId !== undefined) { %>
 
- <form action="/logout" method="POST">
-        <input type="submit" value="LogOut">
- </form>
-
-     <% } else { %>
+  <% if (!userId) { %>
 
 
   <p><a href= "/urls/login",> Login </a> </p>
 
   <p><a href= "/urls/register",> Register  </a> </p>
 
- <%}%>
+
+     <% } else { %>
+
+ <form action="/logout" method="POST" style="margin:0px;">
+        <h4>You are logged in as: <%= userId  %> <button type= "submit">Logout</button></h4>
+      </form>
+ </form>
+
+<% } %>
