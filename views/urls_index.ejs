@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <title>TinyApp</title>
-
-   <% include partials/_header %>
+ <% include partials/_header %>
 </head>
 
 
 
-      <% for(var shortURL in urlDatabase.userId){ %>
-       <li> <a href= <%=urlDatabase.userId/[shortURL]%> > <%= shortURL + " : " +  urlDatabase.userId[shortURL] %>  </a></li>
+      <%  console.log(usersListURL) %>
+
+      <%  for(var shortURL in usersListURL){ %>
+       <li> <a href= <%=usersListURL/[shortURL]%> > <%= shortURL + " : " +  usersListURL[shortURL] %>  </a></li>
          <form method="POST" action="/urls/<%=shortURL%>/delete">
          <input id="shortURL" type="submit" value="Delete">
        </form>

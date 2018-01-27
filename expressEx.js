@@ -12,18 +12,14 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs")
 
 var urlDatabase = {
-              ID123: {
-                "b2xVn2": "http://www.lighthouselabs.ca",
-                "9sm5xK": "http://www.google.com"
-              },
-              ID222: {
-                "4bwexn": "http://www.lighthouselabs.ca",
-              }
-              };
+                  ID123: {"b2xVn2": "http://www.lighthouselabs.ca",
+                        "9sm5xK": "http://www.google.com" },
+                  ID222: { "4bwexn": "http://www.lighthouselabs.ca"}
+                    };
 
 
 var userDatabase = {
-                ID123:  {userId: "ID123",
+                 ID123:  {userId: "ID123",
                              userEmail: "123@123.com",
                              userPassword: "123"
                              },
@@ -32,6 +28,17 @@ var userDatabase = {
                              userPassword: "222"
                              }
                    }
+
+function urlsForUser(id){
+  let currentUser = id
+for(id in urlDatabase) {
+  if (currentUser = id ){
+   let urls = urlDatabase.currentUser
+  return urls
+  }
+ }
+}
+
 
 function generateRandomString() {
   var anysize = 6;//the size of string
@@ -60,13 +67,15 @@ app.get("/urls.json", (req, res) => {
 
 //GET URL
 app.get('/urls', (req,res) => {
-   let userId = req.cookies["userId"];
-  if (userId in userDatabase) {
-   let CurrentUserId = userId;
-   let templateVars = {
-    urlDatabase: CurrentUserId,
-    userId: req.cookies["userId"]};
-  res.render('urls_index', templateVars);
+  let currentUser = req.cookies["userId"];
+  let shortUrl = urlsForUser(currentUser)
+  let usersListURL = urlDatabase[currentUser]
+  if (currentUser in urlDatabase) {
+    let templateVars = {
+         usersListURL: usersListURL,
+         shortUrl: usersListURL,
+         userId: req.cookies["userId"]};
+   res.render('urls_index', templateVars);
     } else {
      let templateVars = {
      userId: req.cookies["userId"]};
@@ -143,11 +152,14 @@ app.get("/hello", (req, res) => {
 });
 
 app.get('/', function (req, res) {
+
 // Cookies that have not been signed
   console.log('Cookies: ', req.cookies)
 })
 
-//>> POST <<
+//>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//>>>>>>>>>> POST <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
  //REGISTER
 app.post("/urls/register", (req, res) => {
@@ -209,8 +221,16 @@ app.post("/urls/register", (req, res) => {
   res.redirect("/urls")
 });
 
+app.post("/urls", (req, res) => {
+
+  let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
+  let shortURL = generateRandomString() //console.log(" random string " + shortURL)
+  urlDatabase.userId[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
+  res.redirect("/urls");
+});
+
 //ADD NEW URL
-app.post("/urls/new", (req, res) => {
+app.post("/urls", (req, res) => {
 
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
   let shortURL = generateRandomString() //console.log(" random string " + shortURL)
