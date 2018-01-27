@@ -61,10 +61,17 @@ app.get("/urls.json", (req, res) => {
 
 app.get('/urls', (req,res) => {
    let userId = req.cookies["userId"];
+  if (userId in userDatabase) {
    let templateVars = {
     url: urlDatabase,
     userId: req.cookies["userId"]};
   res.render('urls_index', templateVars);
+    } else {
+    let templateVars = {
+    url: urlDatabase,
+    userId: req.cookies["userId"]};
+      res.render('urls_login', templateVars);
+    }
 });
 
 
@@ -194,16 +201,14 @@ app.post("/urls/register", (req, res) => {
 // Add New URL'
 
 app.post("/urls", (req, res) => {
-  let userId = req.cookies["userId"]
-  if (!userDatabase.hasOwnProperty(userId)) {
+
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
   let shortURL = generateRandomString() //console.log(" random string " + shortURL)
   urlDatabase[shortURL] = longURL //console.log(urlDatabase) // debug statement to see POST parameters
   res.redirect("/urls");
-  } else {
+
     res.redirect("/urls/login");
-  }
- //res.send("Ok"); removed to redirect back to origal page with new addition
+
 });
 /*
   if (userChecker(req.session.user_id)) {
