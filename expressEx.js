@@ -13,10 +13,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs")
 
-
 app.use(cookieSession({
   name: 'session',
-  keys: ["IloveCookies"],
+  keys: ["secretkey"],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -127,6 +126,7 @@ let userId = req.session.userId;
 
 //SHOW SHORT URL
 app.get("/u/:shortURL", (req, res) => {
+
 var shortURL = req.params.shortURL;
   for (var prop in urlDatabase) {
     var sub = urlDatabase[prop]
@@ -137,7 +137,6 @@ var shortURL = req.params.shortURL;
       }
      }
     }
-
   res.redirect(longURL);
 });
 
@@ -161,7 +160,6 @@ app.get("/urls/:id", (req, res) => {
       res.render('urls_login', templateVars);
     }
 });
-
 
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
@@ -207,7 +205,6 @@ console.log (hashedPassword)
    res.redirect("/urls");
 });
 
-
  //LOGIN PAGE
  app.post("/login", (req, res) => {
 
@@ -242,8 +239,8 @@ console.log (hashedPassword)
 });
 
 app.post("/urls", (req, res) => {
-  let userId = req.session["userId"];
-  let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
+  let userId = req.session.userId
+  let longURL = req.body.longURL
   let shortURL = generateRandomString()
   let userURLs= urlDatabase[userId]
   userURLs[shortURL] = longURL
@@ -253,16 +250,19 @@ app.post("/urls", (req, res) => {
 //ADD NEW URL
 app.post("/urls", (req, res) => {
   let userId = req.session["userId"];
-  let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
-  let shortURL = generateRandomString()
-  let userURLs = urlDatabase[userId]
-  userURLs[shortURL] = longURL
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+  let userURLs = urlDatabase[userId];
+   userURLs[shortURL] = longURL;
+  console.log(" longURL" + longURL);
+    console.log(" userURLs" + userURLs);
+    console.log( "userId" +userId)
   res.redirect("/urls");
 });
 
 //DELETE EXISTING URL
 app.post("/urls/:id/delete", (req, res) => {
-    let userId = req.session["userId"];
+    let userId = req.session.userId
     let shortURL =  req.params.id
     let userURLs = urlDatabase[userId]
   delete userURLs[shortURL]
@@ -271,17 +271,13 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //UPDATE EXISTING URL
 app.post("/urls/:id", (req, res) => {
-  let userId = req.session["userId"];
-  let shortURL = req.params.id //console.log("req.params.id " + req.params.id) //console.log("shortURL " + shortURL)
-  let longURL = req.body.longURL //console.log("req.body" + req.body) // console.log("longURL " + longURL)
+  let userId = req.session.userId
+  let shortURL = req.params.id
+  let longURL = req.body.longURL
   let userURLs = urlDatabase[userId]
   userURLs[shortURL] = longURL
   res.redirect("/urls");
 });
-
-
-
-
 
 app.listen(PORT, () => {
   console.log(PORT)
