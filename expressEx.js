@@ -1,6 +1,7 @@
 
 var express = require("express");
 var cookieParser = require('cookie-parser')
+var cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
 let numP = 10
 var app = express();
@@ -12,12 +13,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs")
 
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["IloveCookies"],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
+
 var urlDatabase = {
                   ID123: {"b2xVn2": "http://www.lighthouselabs.ca",
                         "9sm5xK": "http://www.google.com"
                         },
 
-                  ID222: {"4bwexn": "http://www.lighthouselabs.ca"
+                  ID222: {"4bwexn": "http://www.pinterest.ca"
                       },
                     };
 
@@ -52,64 +62,65 @@ function generateRandomString() {
         result += charset[Math.floor(Math.random() * charset.length)];
     return result;
 }
-//>> GET << Basuc
+//>> GET <<
 
 app.get("/", (req, res) => {
- // let templateVars = {
-//    url: urlDatabase,
-//    username: userDatabase[req.cookies["userId"]]}; // added code
-  res.render('index'/*, templateVars*/);
+   req.session.views = (req.session.views || 0) + 1;
+   res.end(req.session.views + ' views')
+  res.render('index');
 });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//GET URL
+/// GET URL. ///////////////////
 app.get('/urls', (req,res) => {
-  let currentUser = req.cookies["userId"];
+  let currentUser = req.session.userId;
   let shortUrl = urlsForUser(currentUser)
   let usersListURL = urlDatabase[currentUser]
   if (currentUser in urlDatabase) {
     let templateVars = {
          usersListURL: usersListURL,
          shortUrl: usersListURL,
-         userId: req.cookies["userId"]};
+         userId: req.session.userId};
    res.render('urls_index', templateVars);
     } else {
      let templateVars = {
-     userId: req.cookies["userId"]};
+     userId: req.session.userId};
       res.render('urls_login', templateVars)
   }
 });
 
-//GET LOGIN
+/// GET LOGIN /////////////////////
 app.get("/urls/login", (req, res) => {
   let templateVars = {
-  userId: req.cookies["userId"]};
+  userId: req.session.userId};
   res.render("urls_login",templateVars);
 });
 
-//GET REGISTER
+/// GET REGISTER /////////////////////////
 app.get("/urls/register", (req, res) => {
   let templateVars = {
-    userId: req.cookies["userId"]}; /// updated template vars
+    userId: req.session.userId}; /// updated template vars
   res.render("urls_register", templateVars)
 });
 
 //GET NEW
 app.get("/urls/new", (req, res) => {
-let userId = req.cookies["userId"];
+let userId = req.session.userId;
  if (userId in userDatabase) {
   let CurrentUserId = userId;
     let templateVars = {
     urlDatabase: CurrentUserId,
-    userId: userId
+    userId: req.session.userId
     }; // updated template vars
   res.render("urls_new", templateVars);
   } else {
      let templateVars = {
-     userId: req.cookies["userId"]};
+     userId: req.session.userId
+   }
+     ;
       res.render('urls_login', templateVars);
     }
 });
@@ -132,7 +143,7 @@ var shortURL = req.params.shortURL;
 
 //SHOW URL/:ID
 app.get("/urls/:id", (req, res) => {
-  let userId = req.cookies["userId"];
+  let userId = req.session.userId;
   var shortURL = req.params.id;
    if (userId in userDatabase) {
     let currentUserId = userId
@@ -146,7 +157,7 @@ app.get("/urls/:id", (req, res) => {
   } else {
      let templateVars = {
     url: urlDatabase,
-    userId: req.cookies["userId"]};
+    userId: req.session.userId};
       res.render('urls_login', templateVars);
     }
 });
@@ -158,8 +169,8 @@ app.get("/hello", (req, res) => {
 
 app.get('/', function (req, res) {
 
-// Cookies that have not been signed
-  console.log('Cookies: ', req.cookies)
+// session that have not been signed
+  console.log('session: ', req.session)
 })
 
 //>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -170,7 +181,7 @@ app.get('/', function (req, res) {
 app.post("/urls/register", (req, res) => {
  let emailInput = req.body.email;
  let passwordInput = req.body.password;
- let newUserID = generateRandomString()
+ let newUserId = generateRandomString()
  let hashedPassword = bcrypt.hashSync(req.body.password, numP);
 console.log (hashedPassword)
 
@@ -182,16 +193,17 @@ console.log (hashedPassword)
     if (req.body.email == userDatabase[user].userEmail) {
       res.status(400).send({ error: "that email already exists" });
  } else {
-     userDatabase[newUserID] = {
-          userId:  newUserID,
+     userDatabase[newUserId] = {
+          userId:  newUserId,
           userEmail: emailInput,
           userPassword: hashedPassword
            }
 
-     urlDatabase[newUserID] = { }
+     urlDatabase[newUserId] = { }
     }
   }
-   res.cookie('userId', newUserID);
+  console.log(newUserId)
+   req.session.userId = newUserId;
    res.redirect("/urls");
 });
 
@@ -219,18 +231,18 @@ console.log (hashedPassword)
     }
    }
 
-  res.cookie('userId',userIdAssignment);
+  res.session.userId = userIdAssignment;
   res.redirect("/urls")
 });
 
 //LOGOUT
   app.post("/logout", (req, res) => {
-    res.clearCookie('userId');
+    req.session = null;
   res.redirect("/urls")
 });
 
 app.post("/urls", (req, res) => {
-  let userId = req.cookies["userId"];
+  let userId = req.session["userId"];
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
   let shortURL = generateRandomString()
   let userURLs= urlDatabase[userId]
@@ -240,7 +252,7 @@ app.post("/urls", (req, res) => {
 
 //ADD NEW URL
 app.post("/urls", (req, res) => {
-  let userId = req.cookies["userId"];
+  let userId = req.session["userId"];
   let longURL = req.body.longURL //console.log(req.body); // ->  longURL: 'https://www.pinterest.ca' }
   let shortURL = generateRandomString()
   let userURLs = urlDatabase[userId]
@@ -250,7 +262,7 @@ app.post("/urls", (req, res) => {
 
 //DELETE EXISTING URL
 app.post("/urls/:id/delete", (req, res) => {
-    let userId = req.cookies["userId"];
+    let userId = req.session["userId"];
     let shortURL =  req.params.id
     let userURLs = urlDatabase[userId]
   delete userURLs[shortURL]
@@ -259,7 +271,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //UPDATE EXISTING URL
 app.post("/urls/:id", (req, res) => {
-  let userId = req.cookies["userId"];
+  let userId = req.session["userId"];
   let shortURL = req.params.id //console.log("req.params.id " + req.params.id) //console.log("shortURL " + shortURL)
   let longURL = req.body.longURL //console.log("req.body" + req.body) // console.log("longURL " + longURL)
   let userURLs = urlDatabase[userId]
