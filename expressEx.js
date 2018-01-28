@@ -13,8 +13,11 @@ app.set("view engine", "ejs")
 
 var urlDatabase = {
                   ID123: {"b2xVn2": "http://www.lighthouselabs.ca",
-                        "9sm5xK": "http://www.google.com" },
-                  ID222: { "4bwexn": "http://www.lighthouselabs.ca"}
+                        "9sm5xK": "http://www.google.com"
+                        },
+
+                  ID222: {"4bwexn": "http://www.lighthouselabs.ca"
+                      },
                     };
 
 
@@ -23,6 +26,7 @@ var userDatabase = {
                              userEmail: "123@123.com",
                              userPassword: "123"
                              },
+
                  ID222:  {userId: "ID222",
                              userEmail: "222@222.com",
                              userPassword: "222"
@@ -31,7 +35,7 @@ var userDatabase = {
 
 function urlsForUser(id){
   let currentUser = id
-for(id in urlDatabase) {
+ for(id in urlDatabase) {
   if (currentUser = id ){
    let urls = urlDatabase.currentUser
   return urls
@@ -114,16 +118,58 @@ let userId = req.cookies["userId"];
     }
 });
 
-//SHOW SHORT URL
+var findByURL = function(obj, label) {
+    if(obj.label === label) { return obj; }
+    for(var i in obj) {
+      console.log("i" + i)
+        if(obj.hasOwnProperty(i)){
+          console.log("obj[i]" + obj[i])
+           { return obj[i]; }
+        }
+    }
+    return null;
+};
+
+/*for (key in obj) {
+    if(obj.hasOwnProperty(label)) {
+        console.log("key2" + key)
+         console.log(obj[key]);
+        var userId = key
+}
+    }
+}
+*/
+
+function parseObjectKeys(obj) {
+  for (var prop in obj) {
+    console.log(prop)
+    var sub = obj[prop]
+    if (typeof(sub) == "object") {
+      parseObjectKeys(sub);
+    }
+  }
+}
+//SHOW SHORT URL ----Still needs work
 app.get("/u/:shortURL", (req, res) => {
-  let userId = req.cookies["userId"];
-  let templateVars = {
-    url: urlDatabase,
-    userId: userId
-    }; //
-  // let longURL = ...
+var shortURL = req.params.shortURL;
+
+
+  for (var prop in urlDatabase) {
+    var sub = urlDatabase[prop]
+
+    for (var tinyURL in sub){
+      if( tinyURL === shortURL) {
+        var longURL = sub[tinyURL]
+      }
+     }
+    }
+
   res.redirect(longURL);
 });
+
+
+
+
 
 //SHOW URL/:ID
 app.get("/urls/:id", (req, res) => {
