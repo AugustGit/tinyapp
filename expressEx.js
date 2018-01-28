@@ -1,7 +1,8 @@
 
 var express = require("express");
 var cookieParser = require('cookie-parser')
-
+const bcrypt = require('bcrypt');
+let numP = 10
 var app = express();
 app.use(cookieParser())
 var PORT = process.env.PORT || 8080; // default port 8080
@@ -24,12 +25,12 @@ var urlDatabase = {
 var userDatabase = {
                  ID123:  {userId: "ID123",
                              userEmail: "123@123.com",
-                             userPassword: "123"
+                             userPassword: "$2a$10$MyCGkNNJ.oHwhyQwoq2cyu0Xxej.ICCxSA8TWpMeT57ZrhffrJqEG"
                              },
 
                  ID222:  {userId: "ID222",
                              userEmail: "222@222.com",
-                             userPassword: "222"
+                             userPassword: "$2a$10$6EpNgwVqbP3xSPePr2wIDuvB15fwPRswFta73.EeQB6T4kladV5le"
                              }
                    }
 
@@ -42,7 +43,6 @@ function urlsForUser(id){
   }
  }
 }
-
 
 function generateRandomString() {
   var anysize = 6;//the size of string
@@ -60,10 +60,6 @@ app.get("/", (req, res) => {
 //    username: userDatabase[req.cookies["userId"]]}; // added code
   res.render('index'/*, templateVars*/);
 });
-
-//app.get("/", (req, res) => {
-//  res.end("Hello!");
-//});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -118,42 +114,9 @@ let userId = req.cookies["userId"];
     }
 });
 
-var findByURL = function(obj, label) {
-    if(obj.label === label) { return obj; }
-    for(var i in obj) {
-      console.log("i" + i)
-        if(obj.hasOwnProperty(i)){
-          console.log("obj[i]" + obj[i])
-           { return obj[i]; }
-        }
-    }
-    return null;
-};
-
-/*for (key in obj) {
-    if(obj.hasOwnProperty(label)) {
-        console.log("key2" + key)
-         console.log(obj[key]);
-        var userId = key
-}
-    }
-}
-*/
-
-function parseObjectKeys(obj) {
-  for (var prop in obj) {
-    console.log(prop)
-    var sub = obj[prop]
-    if (typeof(sub) == "object") {
-      parseObjectKeys(sub);
-    }
-  }
-}
-//SHOW SHORT URL ----Still needs work
+//SHOW SHORT URL
 app.get("/u/:shortURL", (req, res) => {
 var shortURL = req.params.shortURL;
-
-
   for (var prop in urlDatabase) {
     var sub = urlDatabase[prop]
 
@@ -166,10 +129,6 @@ var shortURL = req.params.shortURL;
 
   res.redirect(longURL);
 });
-
-
-
-
 
 //SHOW URL/:ID
 app.get("/urls/:id", (req, res) => {
@@ -212,6 +171,8 @@ app.post("/urls/register", (req, res) => {
  let emailInput = req.body.email;
  let passwordInput = req.body.password;
  let newUserID = generateRandomString()
+ let hashedPassword = bcrypt.hashSync(req.body.password, numP);
+console.log (hashedPassword)
 
   if (!req.body.email || !req.body.password) {
      res.status(400).send({ error: "missing email or password" });
@@ -224,11 +185,10 @@ app.post("/urls/register", (req, res) => {
      userDatabase[newUserID] = {
           userId:  newUserID,
           userEmail: emailInput,
-          userPassword: passwordInput
+          userPassword: hashedPassword
            }
 
-     urlDatabase[newUserID] = {
-      }
+     urlDatabase[newUserID] = { }
     }
   }
    res.cookie('userId', newUserID);
@@ -238,7 +198,6 @@ app.post("/urls/register", (req, res) => {
 
  //LOGIN PAGE
  app.post("/login", (req, res) => {
- //console.log (req.body.username + req.body.password)
 
  var emailInput = req.body.username;
  var passwordInput = req.body.password;
@@ -252,10 +211,10 @@ app.post("/urls/register", (req, res) => {
 
   if(userIdAssignment === "") {
       res.status(403).send("This user is not registered.");
+
   } else {
 
-    if(userDatabase[userIdAssignment]["userPassword"] !== passwordInput) {
-
+    if (bcrypt.compareSync(passwordInput, userDatabase[userIdAssignment]["userPassword"]) === false ) {
       res.status(403).send("Incorrect password.");
     }
    }
