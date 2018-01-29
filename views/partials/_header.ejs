@@ -1,17 +1,18 @@
 
-<% if(foobar.loginID == null){%>
 
-    <form action="/login" method="POST" style="margin:150px;">
-      <label for="username">< username </label>
-      <input id="username" type="text" name="username" placeholder="http://" style="width: 300px">
-      <input type="submit" value="Submit">
-    </form>
+  <% if (!userId) { %>
 
- <% } else { %>
 
- <%="Logged in as: " + foobar.loginID %>
-  <form action="/login" method="POST" style="margin:150px;">
-        <input type="submit" value="LogOut">
+  <p><a href= "/urls/login",> Login </a> </p>
+
+  <p><a href= "/urls/register",> Register  </a> </p>
+
+
+     <% } else { %>
+
+ <form action="/logout" method="POST" style="margin:0px;">
+        <h4>You are logged in as: <%= userId  %> <button type= "submit">Logout</button></h4>
+      </form>
  </form>
-<%}%>
 
+<% } %>

@@ -2,14 +2,10 @@
 <html lang="en">
 <head>
   <title>TinyApp</title>
+ <% include partials/_header %>
 </head>
-<header>
-    <% include ./partials/_header %>
-</header>
-
-<body>
-      <% for(let shortURL in urls){ %>
-       <li> <a href= <%= urls[shortURL] %> > <%= shortURL + " : " +  urls[shortURL] %>  </a></li>
+      <%  for(var shortURL in usersListURL){ %>
+       <li> <a href= <%=usersListURL/[shortURL]%> > <%= shortURL + " : " +  usersListURL[shortURL] %>  </a></li>
          <form method="POST" action="/urls/<%=shortURL%>/delete">
          <input id="shortURL" type="submit" value="Delete">
        </form>
@@ -19,8 +15,6 @@
      <%  } %>
 
      <p><a href= "/urls/new",> Create new tiny url  </a> </p>
-
-
 
 </body>
 </html>
