@@ -1,0 +1,32 @@
+{
+  "name": "tinyapp",
+  "version": "1.0.0",
+  "description": "TinyApp is a full stack web applicatoin built with Node and Express that allows users to shorten long URLs (a la bit.ly). ## Final Product",
+  "main": "expressEx.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "cookie-parser": "^1.4.3",
+    "body-parser": "^1.18.2",
+    "cookie-session": "^2.0.0-beta.3",
+    "express": "^4.16.2",
+    "ejs": "^2.5.7",
+    "randomstring": "^1.1.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AugustGit/tinyapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AugustGit/tinyapp/issues"
+  },
+  "homepage": "https://github.com/AugustGit/tinyapp#readme"
+}

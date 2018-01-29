@@ -5,7 +5,7 @@
  <% include partials/_header %>
 </head>
       <%  for(var shortURL in usersListURL){ %>
-       <li> <a href= <%=usersListURL/[shortURL]%> > <%= shortURL + " : " +  usersListURL[shortURL] %>  </a></li>
+       <li> <a href = "/u/<%=shortURL%>" > <%= shortURL + " : " +  usersListURL[shortURL] %>  </a></li>
          <form method="POST" action="/urls/<%=shortURL%>/delete">
          <input id="shortURL" type="submit" value="Delete">
        </form>
