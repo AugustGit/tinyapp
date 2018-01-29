@@ -1,9 +1,9 @@
 
 var express = require("express");
-var cookieParser = require('cookie-parser')
-var cookieSession = require('cookie-session')
+var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-let numP = 10
+let numP = 10;
 var app = express();
 app.use(cookieParser())
 var PORT = process.env.PORT || 8080; // default port 8080
@@ -11,7 +11,7 @@ var PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.set("view engine", "ejs")
+app.set("view engine", "ejs");
 
 app.use(cookieSession({
   name: 'session',
@@ -41,17 +41,17 @@ var userDatabase = {
                              userEmail: "222@222.com",
                              userPassword: "$2a$10$6EpNgwVqbP3xSPePr2wIDuvB15fwPRswFta73.EeQB6T4kladV5le"
                              }
-                   }
+                   };
 
 function urlsForUser(id){
-  let currentUser = id
+  let currentUser = id;
  for(id in urlDatabase) {
   if (currentUser = id ){
-   let urls = urlDatabase.currentUser
-  return urls
+   let urls = urlDatabase.currentUser;
+  return urls;
   }
  }
-}
+};
 
 function generateRandomString() {
   var anysize = 6;//the size of string
@@ -60,12 +60,15 @@ function generateRandomString() {
      for( var i=0; i < anysize; i++ )
         result += charset[Math.floor(Math.random() * charset.length)];
     return result;
-}
-//>> GET <<
+};
+//>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//>>>>>>>>>> GET <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
 app.get("/", (req, res) => {
    req.session.views = (req.session.views || 0) + 1;
-   res.end(req.session.views + ' views')
+   res.end(req.session.views + ' views');
   res.render('index');
 });
 
@@ -76,8 +79,8 @@ app.get("/urls.json", (req, res) => {
 /// GET URL. ///////////////////
 app.get('/urls', (req,res) => {
   let currentUser = req.session.userId;
-  let shortUrl = urlsForUser(currentUser)
-  let usersListURL = urlDatabase[currentUser]
+  let shortUrl = urlsForUser(currentUser);
+  let usersListURL = urlDatabase[currentUser];
   if (currentUser in urlDatabase) {
     let templateVars = {
          usersListURL: usersListURL,
@@ -95,7 +98,7 @@ app.get('/urls', (req,res) => {
 app.get("/urls/login", (req, res) => {
   let templateVars = {
   userId: req.session.userId};
-  res.render("urls_login",templateVars);
+  res.render("urls_login",templateVars)
 });
 
 /// GET REGISTER /////////////////////////
@@ -105,7 +108,7 @@ app.get("/urls/register", (req, res) => {
   res.render("urls_register", templateVars)
 });
 
-//GET NEW
+/// GET NEW /////////////////////////
 app.get("/urls/new", (req, res) => {
 let userId = req.session.userId;
  if (userId in userDatabase) {
@@ -113,7 +116,7 @@ let userId = req.session.userId;
     let templateVars = {
     urlDatabase: CurrentUserId,
     userId: req.session.userId
-    }; // updated template vars
+    };
   res.render("urls_new", templateVars);
   } else {
      let templateVars = {
@@ -126,7 +129,6 @@ let userId = req.session.userId;
 
 //SHOW SHORT URL
 app.get("/u/:shortURL", (req, res) => {
-
 var shortURL = req.params.shortURL;
   for (var prop in urlDatabase) {
     var sub = urlDatabase[prop]
@@ -200,7 +202,6 @@ console.log (hashedPassword)
      urlDatabase[newUserId] = { }
     }
   }
-  console.log(newUserId)
    req.session.userId = newUserId;
    res.redirect("/urls");
 });
@@ -210,25 +211,24 @@ console.log (hashedPassword)
 
  var emailInput = req.body.username;
  var passwordInput = req.body.password;
- let userIdAssignment = ""
+ let userId = "";
 
   for (var elem in userDatabase) {
     if(userDatabase[elem]["userEmail"] === emailInput) {
-      userIdAssignment = userDatabase[elem]["userId"];
+      userId = userDatabase[elem]["userId"];
+      req.session.userId = userId;
     }
   }
 
-  if(userIdAssignment === "") {
+  if(userId === "") {
       res.status(403).send("This user is not registered.");
 
   } else {
 
-    if (bcrypt.compareSync(passwordInput, userDatabase[userIdAssignment]["userPassword"]) === false ) {
+    if (bcrypt.compareSync(passwordInput, userDatabase[userId]["userPassword"]) === false ) {
       res.status(403).send("Incorrect password.");
     }
    }
-
-  res.session.userId = userIdAssignment;
   res.redirect("/urls")
 });
 
@@ -239,11 +239,11 @@ console.log (hashedPassword)
 });
 
 app.post("/urls", (req, res) => {
-  let userId = req.session.userId
-  let longURL = req.body.longURL
-  let shortURL = generateRandomString()
-  let userURLs= urlDatabase[userId]
-  userURLs[shortURL] = longURL
+  let userId = req.session.userId;
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString();
+  let userURLs= urlDatabase[userId];
+  userURLs[shortURL] = longURL;
   res.redirect("/urls");
 });
 
@@ -254,33 +254,30 @@ app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   let userURLs = urlDatabase[userId];
    userURLs[shortURL] = longURL;
-  console.log(" longURL" + longURL);
-    console.log(" userURLs" + userURLs);
-    console.log( "userId" +userId)
   res.redirect("/urls");
 });
 
 //DELETE EXISTING URL
 app.post("/urls/:id/delete", (req, res) => {
-    let userId = req.session.userId
-    let shortURL =  req.params.id
-    let userURLs = urlDatabase[userId]
-  delete userURLs[shortURL]
+    let userId = req.session.userId;
+    let shortURL =  req.params.id;
+    let userURLs = urlDatabase[userId];
+  delete userURLs[shortURL];
   res.redirect("/urls");
 });
 
 //UPDATE EXISTING URL
 app.post("/urls/:id", (req, res) => {
-  let userId = req.session.userId
-  let shortURL = req.params.id
-  let longURL = req.body.longURL
-  let userURLs = urlDatabase[userId]
-  userURLs[shortURL] = longURL
+  let userId = req.session.userId;
+  let shortURL = req.params.id;
+  let longURL = req.body.longURL;
+  let userURLs = urlDatabase[userId];
+  userURLs[shortURL] = longURL;
   res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
-  console.log(PORT)
+  console.log(PORT);
   console.log(`Example app listening on port ${PORT}!`);
 });
 
