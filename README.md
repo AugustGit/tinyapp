@@ -3,7 +3,7 @@ TinyApp is a full stack web applicatoin built with Node and Express that allows 
 ## Final Product 
 
 ![personal urls list for registered user.](https://github.com/AugustGit/tinyapp/blob/featureUserRegistration/docs/urls%20page.png?raw=true)
-![edit tinyurls for registered user.] (https://github.com/AugustGit/tinyapp/blob/featureUserRegistration/docs/edit%20page.png?raw=true)
+![edit tinyurls for registered user.](https://github.com/AugustGit/tinyapp/blob/featureUserRegistration/docs/edit%20page.png?raw=true)
 
 
 ##Dependencies
