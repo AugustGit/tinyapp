@@ -14,7 +14,6 @@ EJS
 bcrypt
 body-parser
 cookie-session
-method-override
 
 ## Getting started
 
